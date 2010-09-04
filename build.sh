@@ -8,7 +8,9 @@
 # 3. brew install python (you need 64-bit Python 2.7, after the installation check> python --version, which python should print /usr/local/bin/python)
 # 4. brew install opencv (this installed opencv/2.1.1-pre in my case)
 # 5. (optional) install cxxtest (http://cxxtest.tigris.org/, I skipped this step)
-# 6. (optional) install latest SWIG (I have 1.3.31 in OSX which worked fine)
+# 6. (optional) install latest SWIG 
+#    * I have 1.3.31 in OSX which worked fine, 
+#    * Tom uses 2.0.0 which can be installed via macports: sudo port install swig-python
 
 cmake . || exit 1
 make || exit 2
