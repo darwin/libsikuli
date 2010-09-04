@@ -22,8 +22,8 @@ if platform == 'win32':
                     'oleaut32','uuid','comdlg32']
 
 if platform.find('macosx') >= 0:
-  # opencv_include_dir = ['/usr/local/include/opencv','/opt/local/include/opencv']
-   #opencv_library_dir = ['/usr/local/lib','/opt/local/lib']
+   opencv_include_dir = ['/usr/local/include/opencv', '/usr/local/include/opencv2']
+   #opencv_library_dir = ['/usr/local/lib']
    opencv_libraries = ['opencv_core','opencv_highgui','opencv_legacy','opencv_objdetect','opencv_imgproc']
    opencv_dependency_libraries = ['libpng','libjpeg','libtiff','opencv_lapack','zlib']
 #   opencv_libraries = ['cv','cxcore','highgui',]
@@ -31,8 +31,8 @@ if platform.find('macosx') >= 0:
 
 sikuli_module = Extension('sikuli/_libsikuli',
                            sources = sources,
-                           include_dirs=['../../src','../../include','../../include/opencv'],
-                           library_dirs=['../../lib','../../lib/opencv'],#+ opencv_library_dir,
+                           include_dirs=['../../src','../../include','../../include/opencv']+opencv_include_dir,
+                           library_dirs=['../../lib','../../lib/opencv'], #+opencv_library_dir,
                            extra_link_args=[
                            '-framework ApplicationServices',
                            '-framework AppKit',
