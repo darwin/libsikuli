@@ -68,6 +68,9 @@ if (APPLE)
 	add_definitions(-DMAC)
 
 	include_directories(/Developer/Headers/FlatCarbon )
+	include_directories(/usr/local/include/opencv)
+	include_directories(/usr/local/include/opencv2)
+	
 	find_library(APP_SERVICES_LIBRARY ApplicationServices)
 #	find_library(CARBON_LIBRARY Carbon)      
 	find_library(COCOA_LIBRARY Cocoa)      
