@@ -705,7 +705,7 @@ Robot::keyRelease(int keycode){
 void 
 Robot::waitForIdle(){
    //TODO:
-   delay(50);
+   delay(500);
 }
 
 void 
