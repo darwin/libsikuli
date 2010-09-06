@@ -212,6 +212,8 @@ private:
    vector<Match> repeat(callback func, Pattern target, int seconds, int frequency);   
 
    vector<Match> doFind(Pattern target);
+   
+   void sortMatches(vector<Match>& matches);
 
    bool doFind_callback(Pattern target, vector<Match>& matches);
    bool waitVanish_callback(Pattern target, vector<Match>& matches);

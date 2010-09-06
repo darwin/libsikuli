@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #include "screen.h"
 #include "region.h"
@@ -575,6 +576,28 @@ Region::doFind_callback(Pattern target, vector<Match>& matches){
    return !matches.empty();
 }
 
+// imagine 10x10 pixel grid, order locations by screens, rows and columns to ensure stable order
+struct GridSortPredicate {
+    long score(const Location& l) const {
+        return (l.x / 10) + 10000 * (l.y / 10) + 100000000 * (l.screen);
+    }
+    
+    bool operator() (const Match& a, const Match& b) const {
+        Location la = a.getTarget();
+        Location lb = b.getTarget();
+        
+        long sa = score(la);
+        long sb = score(lb);
+        
+        return sb < sa;
+    }
+};
+
+void
+Region::sortMatches(vector<Match>& matches) {
+    std::sort(matches.begin(), matches.end(), GridSortPredicate());
+}
+
 vector<Match>
 Region::doFind(Pattern target) {
 
@@ -597,6 +620,7 @@ Region::doFind(Pattern target) {
       matches.push_back(match);
    }
    
+   sortMatches(matches);
    
    if (!matches.empty()){
       SikuliUI::sikuliUI->handleMatchFound(*this, target, matches);
