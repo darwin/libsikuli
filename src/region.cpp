@@ -579,7 +579,7 @@ Region::doFind_callback(Pattern target, vector<Match>& matches){
 // imagine 10x10 pixel grid, order locations by screens, rows and columns to ensure stable order
 struct GridSortPredicate {
     long score(const Location& l) const {
-        return (l.x / 10) + 10000 * (l.y / 10) + 100000000 * (l.screen);
+        return (l.x / 10) + 10000 * (l.y / 10) /* + 100000000 * (l.screen) */; // agh, screen is unintialized, leave it out for now
     }
     
     bool operator() (const Match& a, const Match& b) const {
@@ -589,7 +589,7 @@ struct GridSortPredicate {
         long sa = score(la);
         long sb = score(lb);
         
-        return sb < sa;
+        return sa < sb;
     }
 };
 
