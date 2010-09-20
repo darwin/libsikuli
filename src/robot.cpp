@@ -677,14 +677,25 @@ static const char* visualizeCGEventFlags(CGEventFlags flags) {
     return buf;
 }
 
-static void toggleKeyCode(CGKeyCode code, bool down, CGEventFlags flags) {
-    CGEventRef keyEvent = CGEventCreateKeyboardEvent(NULL, (CGKeyCode)code, down);
-    CGEventSetType(keyEvent, down ? kCGEventKeyDown : kCGEventKeyUp);
+static void postKeyboardEvent(CGEventSourceRef source, CGKeyCode code, bool down, CGEventFlags flags) {
+    CGEventRef keyEvent = CGEventCreateKeyboardEvent(source, code, down?TRUE:FALSE);
     CGEventSetFlags(keyEvent, flags);
     CGEventPost(kCGSessionEventTap, keyEvent);
-    printf("SIKULI: toggle key=%04d, down=%s flags=%016x (%s)\n", code, down?"yes":"no ", (unsigned int)flags, visualizeCGEventFlags(flags));
     CFRelease(keyEvent);
-    usleep(1000*100); // 100ms
+}
+
+static void hitKeyCode(CGKeyCode code, CGEventFlags flags) {
+    printf("SIKULI: press key=%04d, flags=%016x (%s)\n", code, (unsigned int)flags, visualizeCGEventFlags(flags));
+
+    CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
+    postKeyboardEvent(source, code, true, flags);
+    postKeyboardEvent(source, code, false, 0);
+    if (flags&kCGEventFlagMaskShift) postKeyboardEvent(source, (CGKeyCode)VK_SHIFT, false, 0);
+    if (flags&kCGEventFlagMaskCommand) postKeyboardEvent(source, (CGKeyCode)VK_META, false, 0);
+    if (flags&kCGEventFlagMaskAlternate) postKeyboardEvent(source, (CGKeyCode)VK_ALT, false, 0);
+    if (flags&kCGEventFlagMaskControl) postKeyboardEvent(source, (CGKeyCode)VK_CONTROL, false, 0);
+    
+    CFRelease(source);
 }
 
 void 
@@ -695,7 +706,7 @@ Robot::keyPress(int keycode){
       case VK_META:     _modifiers |= kCGEventFlagMaskCommand; break;
       case VK_ALT:      _modifiers |= kCGEventFlagMaskAlternate; break;
       default:
-        toggleKeyCode((CGKeyCode)keycode, true, _modifiers);
+        hitKeyCode((CGKeyCode)keycode, _modifiers);
    }
 }
 
@@ -705,14 +716,8 @@ Robot::keyRelease(int keycode){
       case VK_SHIFT:    _modifiers &= ~kCGEventFlagMaskShift; break;
       case VK_CONTROL:  _modifiers &= ~kCGEventFlagMaskControl; break;
       case VK_META:     _modifiers &= ~kCGEventFlagMaskCommand; break;
-      case VK_ALT:      _modifiers &= ~kCGEventFlagMaskAlternate; break;         
-      default:
-        toggleKeyCode((CGKeyCode)keycode, false, 0/*_modifiers*/);
-        return;
+      case VK_ALT:      _modifiers &= ~kCGEventFlagMaskAlternate; break;
    }
-   // in case of key modifier we have to release it explicitely for Snow Leopard
-   // see: http://stackoverflow.com/questions/2008126/cgeventpost-possible-bug-when-simulating-keyboard-events
-   // toggleKeyCode((CGKeyCode)keycode, false, 0);
 }
 
 void 
